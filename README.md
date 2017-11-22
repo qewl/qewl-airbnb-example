@@ -1,21 +1,26 @@
 # GraphQL Airbnb Example
 
-This example illustrates the usage of the GraphQL Gateway pattern with graphql.js and Graphcool.
+This example illustrates the usage of the GraphQL Gateway pattern with Qewl and Graphcool.
 
 ## Getting Started
-### Initializing the Graphcool Service
+### Initializing the Graphcool Services
 ```
-cd database
+cd accomodation-service
 gc deploy
-gc info # put the simple endpoint into the `GRAPHQL_ENDPOINT` env var in .envrc
-gc root-token main # put the root token into the `ADMIN_TOKEN` env var in .envrc
+gc info # put the simple endpoint into the `GRAPHCOOL_ACCOMODATION_ENDPOINT` env var in .env
+gc root-token main # put the root token into the `GRAPHCOOL_ACCOMODATION_TOKEN` env var in .env
+
+cd ..\booking-service
+gc deploy
+gc info # put the simple endpoint into the `GRAPHCOOL_BOOKING_ENDPOINT` env var in .env
+gc root-token main # put the root token into the `GRAPHCOOL_BOOKING_TOKEN` env var in .env
 ```
 
 ### Starting the Gateway
 ```
 yarn install
 yarn start
-# Open http://localhost:4000/
+# Open http://localhost:3000/
 ```
 
 ### Seeding some data
