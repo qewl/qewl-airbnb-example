@@ -20,7 +20,7 @@ gc root-token main # put the root token into the `GRAPHCOOL_BOOKING_TOKEN` env v
 ```
 yarn install
 yarn start
-# Open http://localhost:3000/
+# Open http://localhost:3000/playground
 ```
 
 ### Seeding some data
