@@ -29,5 +29,11 @@ Look in `seed.graphql` to seed some data.
 ### Booking flow
 Look in `queries/booking.graphql` to see the booking flow.
 
+### Technical Variations
+
+`./src/server.ts` shows a variation where all the functionality is added in separate steps (for composition).
+`./src/server-alternative.ts` shows a variation where all the added functionality is added add once (more concise).
+Both variation result in exactly the same Gateway endpoint.
+
 ## License
 MIT
