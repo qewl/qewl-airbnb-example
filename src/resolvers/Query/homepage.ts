@@ -1,38 +1,34 @@
 export const homepage = {
-  topExperiences: async (parent, args, context, info) => {
-    return context.remote.delegateQuery(
-      'allExperiences',
-      { orderBy: 'popularity_DESC' },
-      context,
-      info,
-    )
-  },
-  topHomes: async (parent, args, context, info) => {
-    return context.remote.delegateQuery(
-      'allPlaces',
-      { orderBy: 'popularity_DESC' },
-      context,
-      info,
-    )
-  },
-  topReservations: async (parent, args, context, info) => {
-    return context.remote.delegateQuery(
-      'allRestaurants',
-      { orderBy: 'popularity_DESC' },
-      context,
-      info,
-    )
-  },
-  featuredDestinations: async (parent, args, context, info) => {
-    return context.remote.delegateQuery(
-      'allNeighbourhoods',
-      { orderBy: 'popularity_DESC', filter: { featured: true } },
-      context,
-      info,
-    )
-  },
-  experiencesByCity: async (parent, args, context, info) => {
-    const result = await context.remote.request(`query ($cities: [String!]!) {
+  Query: {
+    topExperiences: {
+      resolve: async event => {
+        return event.delegate('query', 'allExperiences', { orderBy: 'popularity_DESC' })
+      }
+    },
+    topHomes: {
+      resolve: async event => {
+        event.addFields('id')
+        return event.delegate('query', 'allPlaces', { orderBy: 'popularity_DESC' })
+      }
+    },
+    topReservations: {
+      resolve: async event => {
+        return event.delegate('query', 'allRestaurants', { orderBy: 'popularity_DESC' })
+      }
+    },
+    featuredDestinations: {
+      resolve: async event => {
+        return event.delegate('query', 'allNeighbourhoods', {
+          orderBy: 'popularity_DESC',
+          filter: { featured: true }
+        })
+      }
+    },
+    experiencesByCity: {
+      resolve: async event => {
+        const { cities } = event.args
+        const query = `
+        query ($cities: [String!]!) {
           allCities(filter: {
             name_in: $cities
             neighbourhoods_every: {
@@ -45,8 +41,10 @@ export const homepage = {
           }) {
             id
           }
-        }`, {cities: args.cities})
-
-    return result.allCities
-  },
+        }`
+        const result = await event.delegateQuery(query, { cities: event.args.cities })
+        return result.allCities
+      }
+    }
+  }
 }

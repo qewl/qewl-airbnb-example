@@ -1,5 +1,10 @@
 import { GraphQLServer } from 'graphql-yoga'
-import { fetchTypeDefs, RemoteSchema as Remote, collectTypeDefs, GraphcoolLink } from 'graphql-remote'
+import {
+  fetchTypeDefs,
+  RemoteSchema as Remote,
+  collectTypeDefs,
+  GraphcoolLink
+} from 'graphql-remote'
 import * as fs from 'fs'
 import { account } from './resolvers/Mutation/account'
 import { User } from './resolvers/User'
@@ -11,12 +16,14 @@ import { book } from './resolvers/Mutation/book'
 import { addPaymentMethod } from './resolvers/Mutation/addPaymentMethod'
 
 async function run() {
-
-  const makeLink = () => new GraphcoolLink(process.env.GRAPHCOOL_SERVICE_ID, process.env.GRAPHCOOL_TOKEN)
+  const makeLink = () =>
+    new GraphcoolLink(process.env.GRAPHCOOL_SERVICE_ID, process.env.GRAPHCOOL_TOKEN)
 
   const graphcoolTypeDefs = await fetchTypeDefs(makeLink())
 
-  const typeDefs = collectTypeDefs(graphcoolTypeDefs, `
+  const typeDefs = collectTypeDefs(
+    graphcoolTypeDefs,
+    `
     type Query {
       topExperiences: [Experience!]!
       topHomes: [Home!]!
@@ -25,12 +32,12 @@ async function run() {
       experiencesByCity(cities: [String!]!): [ExperiencesByCity!]!
       viewer: Viewer
     }
-    
+
     type Viewer {
       me: User!
       bookings: [Booking!]!
     }
-    
+
     type Mutation {
       signup(
         email: String!
@@ -57,16 +64,16 @@ async function run() {
         numGuests: Int!
       ): BookingResult!
     }
-    
+
     type BookingResult {
       success: Boolean!
     }
-    
+
     type ExperiencesByCity {
       experiences: [Experience!]!
       city: City!
     }
-    
+
     type Home {
       id: ID!
       name: String
@@ -75,7 +82,7 @@ async function run() {
       avgRating: Float!
       pictures(first: Int): [Picture!]!
     }
-    
+
     type Reservation {
       id: ID!
       title: String!
@@ -86,7 +93,7 @@ async function run() {
       slug: String!
       popularity: Int!
     }
-    
+
     type Experience {
       id: ID!
       category: ExperienceCategory
@@ -97,7 +104,7 @@ async function run() {
       preview: Picture!
       popularity: Int!
     }
-    
+
     type Review {
       accuracy: Int!
       checkIn: Int!
@@ -111,7 +118,7 @@ async function run() {
       value: Int!
     }
 
-    
+
     type Neighbourhood {
       id: ID!
       name: String!
@@ -121,7 +128,7 @@ async function run() {
       featured: Boolean!
       popularity: Int!
     }
-    
+
     type Location {
       id: ID!
       lat: Float!
@@ -129,12 +136,12 @@ async function run() {
       address: String
       directions: String
     }
-    
+
     type Picture {
       id: ID!
       url: String!
     }
-    
+
     type City {
       id: ID!
       name: String!
@@ -146,8 +153,8 @@ async function run() {
       name: String!
       experience: Experience
     }
-    
-    
+
+
     type User {
       bookings: [Booking!]
       createdAt: DateTime!
@@ -180,7 +187,7 @@ async function run() {
       paypal: PaypalInformation
       creditcard: CreditCardInformation
     }
-    
+
     type Place {
       id: ID! @isUnique
       name: String
@@ -205,7 +212,7 @@ async function run() {
       pictures: [Picture!]
       popularity: Int!
     }
-    
+
     type Booking {
       id: ID! @isUnique
       createdAt: DateTime!
@@ -215,7 +222,7 @@ async function run() {
       endDate: DateTime!
       payment: Payment!
     }
-    
+
     type Notification {
       createdAt: DateTime!
       id: ID!
@@ -353,14 +360,15 @@ async function run() {
       wheelchairAccessible: Boolean!
       wirelessInternet: Boolean!
     }
-  `)
+  `
+  )
 
   fs.writeFileSync('./typeDefs.graphql', typeDefs)
 
   const resolvers = {
     Query: {
       ...homepage,
-      viewer: () => ({}),
+      viewer: () => ({})
     },
     Viewer,
     ExperiencesByCity,
@@ -368,15 +376,15 @@ async function run() {
     Mutation: {
       ...account,
       book,
-      addPaymentMethod,
+      addPaymentMethod
     },
-    User,
+    User
   }
 
   const server = new GraphQLServer({
     typeDefs,
     resolvers,
-    context: req => ({ ...req, remote: new Remote(makeLink()) }),
+    context: req => ({ ...req, remote: new Remote(makeLink()) })
   })
   server.start(() => console.log('Server is running on localhost:4000'))
 }

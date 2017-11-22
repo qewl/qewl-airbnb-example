@@ -1,17 +1,9 @@
-import { getUserId } from '../../utils'
+export const addPaymentMethod = {
+  resolve: async event => {
+    const { userId: id} = event.context.user
 
-export async function addPaymentMethod(parent, args, ctx, info) {
-  const userId = getUserId(ctx)
-  await ctx.remote.request(`mutation addPaymentMethod(
-    $userId: ID!
-    $creditCard: PaymentAccountcreditcardCreditCardInformation
-  ) {
-    createPaymentAccount(userId: $userId creditcard: $creditCard) {
-      id
-    }
-  }`, {...args, userId})
-
-  // TODO: send email to user
-
-  return info.delegateQuery('User', {id: userId}, {}, {}, info)
+    await event.delegate('mutation', 'createPaymentAccount', { userId: id, creditcard: event.args })
+    // TODO: send email to user
+    return event.delegate('query', 'User', { id })
+  }
 }

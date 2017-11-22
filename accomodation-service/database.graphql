@@ -11,8 +11,8 @@ type User @model {
   location: Location @relation (name: "UserLocation")
   responseRate: Float
   responseTime: Int
-  bookings: [Booking!]! @relation(name: "Bookee")
-  paymentAccount: [PaymentAccount!]! @relation(name: "UserPaymentAccounts")
+  # bookings: [Booking!]! @relation(name: "Bookee")
+  # paymentAccount: [PaymentAccount!]! @relation(name: "UserPaymentAccounts")
   phone: String!
   sentMessages: [Message!]! @relation(name: "SentMessages")
   receivedMessages: [Message!]! @relation(name: "ReceivedMessages")
@@ -41,7 +41,7 @@ type Place @model {
   guestRequirements: GuestRequirements @relation (name: "GuestRequirements")
   policies: Policies @relation (name: "Policies")
   houseRules: HouseRules @relation (name: "HouseRules")
-  bookings: [Booking!]! @relation (name: "PlaceBooking")
+  # bookings: [Booking!]! @relation (name: "PlaceBooking")
   pictures: [Picture!]! @relation (name: "PlacePictures")
   popularity: Int!
 }
@@ -242,61 +242,61 @@ type Review @model {
   experience: Experience @relation (name: "ExperienceReviews")
 }
 
-type Booking @model {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  bookee: User! @relation (name: "Bookee")
-  place: Place! @relation (name: "PlaceBooking")
-  startDate: DateTime!
-  endDate: DateTime!
-  payment: Payment! @relation (name: "BookingPayment")
-}
+# type Booking @model {
+#   id: ID! @isUnique
+#   createdAt: DateTime!
+#   bookee: User! @relation (name: "Bookee")
+#   place: Place! @relation (name: "PlaceBooking")
+#   startDate: DateTime!
+#   endDate: DateTime!
+#   payment: Payment! @relation (name: "BookingPayment")
+# }
 
-type Payment @model {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  serviceFee: Float!
-  placePrice: Float!
-  totalPrice: Float!
-  booking: Booking! @relation (name: "BookingPayment")
-  paymentMethod: PaymentAccount! @relation (name: "PaymentAccounts")
-}
+# type Payment @model {
+#   id: ID! @isUnique
+#   createdAt: DateTime!
+#   serviceFee: Float!
+#   placePrice: Float!
+#   totalPrice: Float!
+#   booking: Booking! @relation (name: "BookingPayment")
+#   paymentMethod: PaymentAccount! @relation (name: "PaymentAccounts")
+# }
 
-type PaymentAccount @model {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  type: PAYMENT_PROVIDER
-  user: User! @relation(name: "UserPaymentAccounts")
-  payments: [Payment!]! @relation(name: "PaymentAccounts")
-  paypal: PaypalInformation @relation(name: "PaypalInformation")
-  creditcard: CreditCardInformation @relation(name: "CreditCardInformation")
-}
+# type PaymentAccount @model {
+#   id: ID! @isUnique
+#   createdAt: DateTime!
+#   type: PAYMENT_PROVIDER
+#   user: User! @relation(name: "UserPaymentAccounts")
+#   payments: [Payment!]! @relation(name: "PaymentAccounts")
+#   paypal: PaypalInformation @relation(name: "PaypalInformation")
+#   creditcard: CreditCardInformation @relation(name: "CreditCardInformation")
+# }
 
-type PaypalInformation @model {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  email: String!
-  paymentAccount: PaymentAccount! @relation(name: "PaypalInformation")
-}
+# type PaypalInformation @model {
+#   id: ID! @isUnique
+#   createdAt: DateTime!
+#   email: String!
+#   paymentAccount: PaymentAccount! @relation(name: "PaypalInformation")
+# }
 
-type CreditCardInformation @model {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  cardNumber: String!
-  expiresOnMonth: Int!
-  expiresOnYear: Int!
-  securityCode: String!
-  firstName: String!
-  lastName: String!
-  postalCode: String!
-  country: String!
-  paymentAccount: PaymentAccount @relation(name: "CreditCardInformation")
-}
+# type CreditCardInformation @model {
+#   id: ID! @isUnique
+#   createdAt: DateTime!
+#   cardNumber: String!
+#   expiresOnMonth: Int!
+#   expiresOnYear: Int!
+#   securityCode: String!
+#   firstName: String!
+#   lastName: String!
+#   postalCode: String!
+#   country: String!
+#   paymentAccount: PaymentAccount @relation(name: "CreditCardInformation")
+# }
 
-enum PAYMENT_PROVIDER {
-  PAYPAL
-  CREDIT_CARD
-}
+# enum PAYMENT_PROVIDER {
+#   PAYPAL
+#   CREDIT_CARD
+# }
 
 type Message @model {
   id: ID! @isUnique

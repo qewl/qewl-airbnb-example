@@ -1,7 +1,12 @@
 import * as jwt from 'jsonwebtoken'
 
 export const User = {
-  token: ({id}) => {
-    return jwt.sign({ userId: id }, process.env.JWT_SECRET!)
+  User: {
+    token: {
+      fragment: `fragment UserFragment on User { id }`,
+      resolve: (event) => {
+        return jwt.sign({ userId: event.parent.id }, process.env.JWT_SECRET!)
+      }
+    }
   }
 }

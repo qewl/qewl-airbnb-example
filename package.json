@@ -4,20 +4,24 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --ext ts --exec node ./node_modules/ts-node/dist/bin.js src/index.ts"
+    "start": "nodemon --ext ts --exec ts-node src/server.ts"
   },
   "dependencies": {
-    "apollo-link-http": "^1.2.0",
-    "bcrypt": "^1.0.3",
-    "graphql-remote": "^0.1.1",
-    "graphql-tag": "^2.5.0",
-    "graphql-yoga": "^0.1.1",
+    "apollo-link": "^1.0.3",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^4.0.0",
+    "express": "^4.16.2",
+    "express-jwt": "^5.3.0",
+    "graphql": "^0.11.7",
+    "graphql-playground-middleware-express": "^1.1.4",
     "jsonwebtoken": "^8.1.0",
-    "node-fetch": "^1.7.3"
+    "qewl": "^0.2.18"
   },
   "devDependencies": {
+    "@types/express-jwt": "^0.0.38",
     "nodemon": "^1.12.1",
     "ts-node": "^3.3.0",
+    "tslint": "^5.8.0",
     "typescript": "^2.6.1"
   }
 }

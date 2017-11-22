@@ -1,0 +1,61 @@
+type Booking @model {
+  id: ID! @isUnique
+  createdAt: DateTime!
+# bookee: User! @relation (name: "Bookee")
+  bookeeId: String!
+# place: Place! @relation (name: "PlaceBooking")
+  placeId: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  payment: Payment! @relation (name: "BookingPayment")
+}
+
+type Payment @model {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  serviceFee: Float!
+  placePrice: Float!
+  totalPrice: Float!
+  booking: Booking! @relation (name: "BookingPayment")
+  paymentMethod: PaymentAccount! @relation (name: "PaymentAccounts")
+}
+
+type PaymentAccount @model {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  type: PAYMENT_PROVIDER
+# user: User! @relation(name: "UserPaymentAccounts")
+  userId: String!
+  payments: [Payment!]! @relation(name: "PaymentAccounts")
+  paypal: PaypalInformation @relation(name: "PaypalInformation")
+  creditcard: CreditCardInformation @relation(name: "CreditCardInformation")
+}
+
+type PaypalInformation @model {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  email: String!
+  paymentAccount: PaymentAccount! @relation(name: "PaypalInformation")
+}
+
+type CreditCardInformation @model {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  cardNumber: String!
+  expiresOnMonth: Int!
+  expiresOnYear: Int!
+  securityCode: String!
+  firstName: String!
+  lastName: String!
+  postalCode: String!
+  country: String!
+  paymentAccount: PaymentAccount @relation(name: "CreditCardInformation")
+}
+
+enum PAYMENT_PROVIDER {
+  PAYPAL
+  CREDIT_CARD
+}
+
+
+

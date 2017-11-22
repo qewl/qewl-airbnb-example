@@ -1,13 +1,16 @@
 export const ExperiencesByCity = {
-  city: async ({ id }, args, context, info) => {
-    return context.remote.delegateQuery( 'City', { id }, context, info)
-  },
-  experiences: async ({ id }, args, context, info) => {
-    return context.remote.delegateQuery(
-      'allExperiences',
-      { filter: { location: { neighbourHood: { city: { id } } } } },
-      context,
-      info,
-    )
-  },
+  ExperiencesByCity: {
+    city: {
+      resolve: event => {
+        return event.delegate('query', 'City', { id: event.parent.id })
+      }
+    },
+    experiences: {
+      resolve: event => {
+        return event.delegate('query', 'allExperiences', {
+          filter: { location: { neighbourHood: { city: { id: event.parent.id } } } }
+        })
+      }
+    }
+  }
 }

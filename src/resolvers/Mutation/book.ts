@@ -1,19 +1,18 @@
-import { getUserId } from '../../utils'
+export const book = async event => {
+  const { userId } = event.context.user
+  const { placeId, checkIn, checkOut } = event.args
 
-export async function book(parent, args, ctx, info) {
-  const userId = getUserId(ctx)
-
-  const paymentAccount = await getPaymentAccount(userId, ctx)
+  const paymentAccount = await getPaymentAccount(userId, event)
   if (!paymentAccount) {
     throw new Error(`You don't have a payment method yet`)
   }
 
-  if (await alreadyBooked(args.placeId, args.checkIn, args.checkOut, ctx)) {
+  if (await alreadyBooked(placeId, checkIn, checkOut, event)) {
     throw new Error(`The requested time is not free.`)
   }
 
-  const days = daysBetween(new Date(args.checkIn), new Date(args.checkOut))
-  const {Place} = await getPlace(args.placeId, ctx)
+  const days = daysBetween(new Date(checkIn), new Date(checkOut))
+  const { Place } = await getPlace(placeId, event)
 
   const placePrice = days * Place.pricing.perNight
   const totalPrice = placePrice * 1.2
@@ -26,7 +25,7 @@ export async function book(parent, args, ctx, info) {
   // TODO implement real stripe
   await payWithStripe(payment)
 
-  await createBooking(args.checkIn, args.checkOut, userId, args.placeId, payment, ctx)
+  await createBooking(checkIn, checkOut, userId, placeId, payment, event)
 
   return {success: true}
 }
@@ -35,12 +34,12 @@ function payWithStripe(payment: any) {
   return Promise.resolve()
 }
 
-function createBooking(startDate: string, endDate: string, bookeeId: string, placeId: string, payment: any, ctx: any) {
-  return ctx.remote.request(`mutation createBooking(
+async function createBooking(startDate: string, endDate: string, bookeeId: string, placeId: string, payment: any, event: any) {
+  const result = await event.delegateQuery(`mutation createBooking(
     $startDate: DateTime!
     $endDate: DateTime!
-    $bookeeId: ID!
-    $placeId: ID!
+    $bookeeId: String!
+    $placeId: String!
     $payment: BookingpaymentPayment
   ) {
     createBooking(
@@ -53,10 +52,12 @@ function createBooking(startDate: string, endDate: string, bookeeId: string, pla
       id
     }
   }`, {startDate, endDate, bookeeId, placeId, payment})
+
+  return result
 }
 
-function getPlace(id: string, ctx: any) {
-  return ctx.remote.request(`{
+async function getPlace(id: string, event: any) {
+  const result = await event.delegateQuery(`{
     Place(id: "${id}") {
       id
       pricing {
@@ -64,13 +65,15 @@ function getPlace(id: string, ctx: any) {
       }
     }
   }`)
+
+  return result
 }
 
-async function getPaymentAccount(userId: string, ctx: any) {
-  const {User} = await ctx.remote.request(`{
-    User(id: "${userId}") {
+async function getPaymentAccount(userId: string, event: any) {
+  const result = await event.delegateQuery(`query ($id: ID!){
+    User(id: $id) {
       id
-      paymentAccount {
+      paymentAccounts {
         id
         creditcard {
           id
@@ -85,23 +88,22 @@ async function getPaymentAccount(userId: string, ctx: any) {
         }
       }
     }
-  }`)
+  }`, { id: userId})
 
-  return User.paymentAccount[0]
+  return result.User.paymentAccounts[0]
 }
 
-async function alreadyBooked(placeId: string, start: string, end: string, ctx: any) {
-  const {Place} = await ctx.remote.request(`{
-    Place(id: "${placeId}") {
-      bookings(filter: {
-        startDate_gte: "${start}"
-        startDate_lte: "${end}"
+async function alreadyBooked(placeId: string, start: string, end: string, event: any) {
+  const { allBookings } = await event.delegateQuery(`{
+    allBookings(filter: {
+      placeId: "${placeId}"
+      startDate_gte: "${start}"
+      startDate_lte: "${end}"
       }) {
-        id
-      }
+      id
     }
   }`)
-  return Place.bookings.length > 0
+  return allBookings.length > 0
 }
 
 function daysBetween(date1, date2) {
@@ -113,7 +115,7 @@ function daysBetween(date1, date2) {
   const date2Ms = date2.getTime()
 
   // Calculate the difference in milliseconds
-  const difference_ms = Math.abs(date1Ms - date2Ms)
+  const differenceMs = Math.abs(date1Ms - date2Ms)
 
-  return Math.round(difference_ms/ONE_DAY)
+  return Math.round(differenceMs / ONE_DAY)
 }
